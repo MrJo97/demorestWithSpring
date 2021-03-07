@@ -43,7 +43,7 @@
 			    
 			    console.log(array.length);*/
 			    console.log(aliens.aliens.length);
-				//console.log(aliens[0].points);   Nonva bene! devi mettere aliens.aliens[0].points
+				//console.log(aliens[0].points);   Non va bene! devi mettere aliens.aliens[0].points
 				$("#field1").val(aliens.aliens[1].name);
 				$("#field2").val(aliens.aliens[1].points);
 			}
@@ -51,7 +51,7 @@
 
 	}
 
-	function listaAlieni() {
+	function listaAlieni(button) {
 		console.log("lista dinamica degli alieni");
 		/*jQuery.getJSON("../aliens1?callback=?", function(alien)
 						{	
@@ -66,14 +66,18 @@
 		jQuery.ajax({
 			type : "GET", //The HTTP request method.
 			url : "http://localhost:8080/demorestWithSpring/aliens1", //The URL of the data to fetch.
-			data : null, //Don't add any data to the URL.
+			//data : null, //Don't add any data to the URL.
+			data: {
+			    "button" : button
+		   		  },
 			dataType : "json", //Execute the response as a script once we get it.
 			contentType : "application/json",
-			success : function(aliens) {
+			success : function(JSONdata) {
 				console.log("funzione di callback invocata");
-				console.log(typeof aliens);
-				console.log((aliens.aliens[0]).name);
-				console.log(aliens.aliens[1]);
+				console.log(typeof JSONdata);
+				console.log((JSONdata.aliens[0]).name);
+				console.log(JSONdata.aliens[1]);
+				console.log("pageNumber: " + JSONdata.pageNumber);
 				//console.log(aliens[0].points);   Nonva bene! devi mettere aliens.aliens[0].points
 				/*$("#field1").val(aliens.aliens[1].name);
 				$("#field2").val(aliens.aliens[1].points);*/
@@ -83,8 +87,15 @@
 				$('#users .list li').remove();
 				//$('#users .list').empty();
 				
-				for(var i = 0; i<aliens.aliens.length; i++)
-					$('#users .list').append('<li><h3 class="name">'+aliens.aliens[i].name+'</h3></li>')
+				for(var i = 0; i<JSONdata.aliens.length && i < JSONdata.pageNumber*4; i++)
+					$('#users .list').append('<li><h3 class="name">'+JSONdata.aliens[i].name+'</h3></li>');
+
+				$(pageCount).text(JSONdata.pageNumber+"/"+Math.ceil(JSONdata.aliens.length/4));
+
+				//sennò per creare delle liste che si pongono una di fianco all'altra potrei fare:
+				//$('#users').append('<ul class="list"><li><h3 class="name">'+JSONdata.aliens[i].name+'</h3></li></ul>');
+				//dove mi aspetto che siano stati definiti dei css per la classe list in cui le diverse <ul> vengono 
+				//poste una di fianco all'altra (tipo con float:left o simili)
 			}
 		});
 
@@ -110,7 +121,7 @@
 	<p>
 		Clicca per ottenere la lista di <a href="aliens">alieni</a>.
 	</p>
-	<button id="bottone1" onclick="listaAlieni()">clicca per la lista di
+	<button id="bottone1" onclick="listaAlieni('show')">clicca per la lista di
 		alieni</button>
 	<!-- onclick="alieni()"-->
 
@@ -140,6 +151,7 @@
 		</ul>
 	</div>
 	
-	
+	<button id="bottone1" onclick="listaAlieni('prev')">PREV</button><button id="bottone1" onclick="listaAlieni('next')">NEXT</button>
+	<div id="pageCount"></div>
 </body>
 </html>
